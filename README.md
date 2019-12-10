@@ -7,7 +7,7 @@ It was about time to migrate my techical documentation here.
 
 #### Table of Contents
 
-* [GitLab Installation](GitLab.md)
+* [GitLab](GitLab.md)
 * [OpenSSL](OpenSSL.md)
 * [OpenDS](OpenDS.md)
 * [XMONAD](xmonad.md)
