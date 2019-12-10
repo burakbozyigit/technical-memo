@@ -51,3 +51,6 @@ More: <https://www.digicert.com/ssl-support/pem-ssl-creation.htm>
 
 ## SSL Pinning
 `openssl rsa -in private.key -outform der -pubout | openssl dgst -sha256 -binary | openssl enc -base64`
+
+## Turn .key file into .pem file 
+`openssl rsa -in key_file.key -out key_file.pem`

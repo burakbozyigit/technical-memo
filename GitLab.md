@@ -3,6 +3,7 @@ GitLab installation page has written eons ago.
 I suggest you refer the [Original documentation](https://about.gitlab.com/install/).
 
 
+# Installation
 ```
 root@eyesat:~# curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -104,11 +105,32 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'EOS' # remember to close this block
 EOS
 ```
 
+# Adding SSL
+### SSL Path
+```
+bbozyigit@server:~$ sudo ls -al /etc/gitlab/ssl/
+[sudo] password for bbozyigit:
+total 16
+drwx------ 2 root root 4096 Feb 29 16:55 .
+drwxrwxr-x 3 root root 4096 Apr 28 15:23 ..
+-rw-r--r-- 1 root root 3468 Feb 29 16:55 fullchain.pem
+-rw-r--r-- 1 root root 1704 Feb 29 16:55 privkey.pem
+```
 
-LDAP Kullanıcıları, logout-login yapınca admin olmaktan çıkıyorlar.
+### Configuration
+**/etc/gitlab/gitlab.rb**
+```
+nginx['enable'] = true
+nginx['redirect_http_to_https'] = true
+nginx['ssl_certificate'] = "/etc/gitlab/ssl/fullchain.pem"
+nginx['ssl_certificate_key'] = "/etc/gitlab/ssl/privkey.pem"
+```
+### Activate Config
+```
+bbozyigit@server:~$ sudo gitlab-ctl reconfigure
+```
 
-Dışarıda kalırsanız login olduktan sonra aşağıdaki yönetmi uygulamanız gerekli. Ayrıca root kullanıcı var bu durumun etrafından dolaşmak için.
-
+# Make LDAP User root
 ```
 root@faithseven:~# gitlab-rails console production
 Loading production environment (Rails 4.2.4)
@@ -132,3 +154,33 @@ name: "Burak Bozyiğit", admin: true
 ...
 ```
 
+# Backup GitLab EE
+```
+root@server:~# mkdir -p /userdata/gitBackups
+root@server:~# chown -R git /userdata/gitBackups/
+root@server:~# vim /etc/gitlab/gitlab.rb
+```
+
+**/etc/gitlab/gitlab.rb**
+```
+gitlab_rails['manage_backup_path'] = true
+gitlab_rails['backup_path'] = "/userdata/gitBackups"
+gitlab_rails['backup_archive_permissions'] = 0644 # See: http://doc.gitlab.com/ce/raketasks/backup_restore.html#backup-archive-permissions
+gitlab_rails['backup_pg_schema'] = 'public'
+gitlab_rails['backup_keep_time'] = 604800
+gitlab_rails['backup_upload_connection'] = {
+  'provider' => 'AWS',
+  'region' => 'eu-west-1',
+  'aws_access_key_id' => '{KEY_ID}',
+  'aws_secret_access_key' => '{ACCESS_KEY}'
+}
+gitlab_rails['backup_upload_remote_directory'] = 'git-backups-prod'
+gitlab_rails['backup_multipart_chunk_size'] = 104857600
+gitlab_rails['backup_encryption'] = 'AES256' # Turns on AWS Server-Side Encryption with Amazon S3-Managed Keys for backups
+```
+
+```
+root@server:~# gitlab-ctl reconfigure
+root@server:~# crontab -l
+0 2 * * * /opt/gitlab/bin/gitlab-rake gitlab:backup:create
+```
