@@ -77,10 +77,6 @@ data blocks changed from 13107200 to 65552384
 ```
 
 ## LVM Disk Decrease
-
-```Disk decreasing...```
-
-
 If you're having `Enter root password for maintenance` message and unable to log in:
 
 1. Type `e` to edit the default kernel line.
