@@ -50,8 +50,6 @@ Syncing disks.
 
 ### Centos <= 6.x
 
-
-
 ```
 [root@server html]# resize2fs /dev/mapper/vg_volumegroup-lv_root
 resize2fs 1.41.12 (17-May-2010)
@@ -82,3 +80,31 @@ data blocks changed from 13107200 to 65552384
 
 ```Disk decreasing...```
 
+
+If you're having `Enter root password for maintenance` message and unable to log in:
+
+1. Type `e` to edit the default kernel line.
+2. Type `e` again on the line that starts with `kernel`.
+3. Add `init=/bin/bash` to the end of the `kernel` line then press enter.
+4. Type `b` to boot the modified kernel parameters.
+5. Once you’re at the /bin/bash prompt you will need to remount the root file system as read/write in order to edit the passwd file:
+    * `mount -o remount,rw /`
+6. Change your root password:
+    * `passwd root`
+7. Remount the filesystem back to read only:
+    * `mount -o remount,ro /`
+8. Reboot your server using CTR-ALT-DELETE.
+
+```
+umount /home # Disk should be unmounted.
+e2fsck -f /dev/mapper/vg_oracle-lv_home # Check partition integrity
+resize2fs /dev/mapper/vg_oracle-lv_home 20G # Decrease filesystem
+lvreduce -L 20G /dev/mapper/vg_oracle-lv_home # Decrease logical volume
+pvs -v --segments /dev/sda2 # Information about PV. These numbers show which sector starts-ends where. Show fragmentations.
+pvmove --alloc anywhere /dev/sda2:XXXX-end # You should carefully change the XXXX part to decrease PV. This is risky.
+pvresize --setphysicalvolumesize 79892M /dev/sda2
+```
+---
+**I did not experianced this part yet**
+
+https://www.experts-exchange.com/articles/12938/HOW-TO-Shrink-a-VMware-Virtual-Machine-Disk-VMDK-in-15-minutes.html
