@@ -11,6 +11,7 @@ It was about time to migrate my technical documentation here.
 
 * [Backup](Backup.md)
 * [GitLab](GitLab.md)
+* [LVM Disk Operations](LVM%20Disk%20Operations.md)
 * [OpenSSL](OpenSSL.md)
 * [OpenDS](OpenDS.md)
 * [Postfix](Postfix.md)
