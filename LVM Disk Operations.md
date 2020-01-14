@@ -101,6 +101,6 @@ pvmove --alloc anywhere /dev/sda2:XXXX-end # You should carefully change the XXX
 pvresize --setphysicalvolumesize 79892M /dev/sda2
 ```
 ---
-**I did not experianced this part yet**
+**I did not experienced this part yet**
 
 https://www.experts-exchange.com/articles/12938/HOW-TO-Shrink-a-VMware-Virtual-Machine-Disk-VMDK-in-15-minutes.html
